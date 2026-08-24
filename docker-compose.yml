@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: zelador_user
+      POSTGRES_PASSWORD: zelador_password
+      POSTGRES_DB: zelador_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://zelador_user:zelador_password@db:5432/zelador_db
+      - SECRET_KEY=minha_chave_super_secreta_para_desenvolvimento
+      - ACCESS_TOKEN_EXPIRE_MINUTES=11520 # 8 dias
+    volumes:
+      - .:/app
+      - visitor_photos:/app/media/fotos_visitantes
+    depends_on:
+      - db
+    command: >
+      sh -c "python init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+volumes:
+  postgres_data:
+  visitor_photos:
