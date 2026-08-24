@@ -74,6 +74,24 @@ const api = {
         return this.request('/departments/');
     },
 
+    async createDepartment(data) {
+        return this.request('/departments/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async getUsers() {
+        return this.request('/users/');
+    },
+
+    async createUser(data) {
+        return this.request('/users/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+
     async getActiveVisits() {
         return this.request('/visits/active');
     },

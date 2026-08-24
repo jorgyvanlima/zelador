@@ -8,41 +8,104 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body class="dashboard-body">
-    <nav class="glass-nav">
+
+    <!-- Sidebar -->
+    <aside class="glass-sidebar" id="sidebar">
         <div class="logo">
             <span class="logo-icon">🏢</span> Zelador
         </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-link active" data-target="portaria-view">🚪 Portaria</a>
+            <a href="#" class="nav-link admin-only" data-target="departments-view" style="display: none;">🏢 Gerenciar Setores</a>
+            <a href="#" class="nav-link admin-only" data-target="users-view" style="display: none;">👥 Gerenciar Usuários</a>
+        </nav>
         <div class="user-menu">
-            <span id="current-user">Usuário Logado</span>
+            <div id="current-user-info">
+                <span id="current-user">Usuário Logado</span>
+                <small id="current-role">Role</small>
+            </div>
             <button id="logout-btn" class="btn-outline">Sair</button>
         </div>
-    </nav>
+    </aside>
 
-    <main class="dashboard-container">
-        <header class="page-header">
-            <h1>Painel da Portaria</h1>
-            <button id="new-visit-btn" class="btn-primary">+ Registrar Nova Entrada</button>
-        </header>
+    <main class="dashboard-content">
+        <!-- VIEW: Portaria -->
+        <div id="portaria-view" class="view-section active">
+            <header class="page-header">
+                <h1>Painel da Portaria</h1>
+                <button id="new-visit-btn" class="btn-primary">+ Registrar Nova Entrada</button>
+            </header>
 
-        <section class="glass-container table-container">
-            <h2>Visitantes no Local (<span id="active-count">0</span>)</h2>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Visitante ID</th>
-                        <th>Setor ID</th>
-                        <th>Entrada</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="active-visits-list">
-                    <!-- Registros populados via JS -->
-                </tbody>
-            </table>
-        </section>
+            <section class="glass-container table-container">
+                <h2>Visitantes no Local (<span id="active-count">0</span>)</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Visitante ID</th>
+                            <th>Setor ID</th>
+                            <th>Entrada</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active-visits-list">
+                        <!-- Registros populados via JS -->
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+        <!-- VIEW: Gerenciar Setores (Admin) -->
+        <div id="departments-view" class="view-section" style="display: none;">
+            <header class="page-header">
+                <h1>Gerenciar Setores</h1>
+                <button id="new-dept-btn" class="btn-primary">+ Novo Setor</button>
+            </header>
+
+            <section class="glass-container table-container">
+                <h2>Lista de Setores Ativos</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Ramal / Tel</th>
+                            <th>Andar/Sala</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departments-list">
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+        <!-- VIEW: Gerenciar Usuários (Admin) -->
+        <div id="users-view" class="view-section" style="display: none;">
+            <header class="page-header">
+                <h1>Gerenciar Usuários do Sistema</h1>
+                <button id="new-user-btn" class="btn-primary">+ Novo Usuário</button>
+            </header>
+
+            <section class="glass-container table-container">
+                <h2>Lista de Usuários</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Email</th>
+                            <th>Perfil</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-list">
+                    </tbody>
+                </table>
+            </section>
+        </div>
     </main>
 
-    <!-- Modal Novo Visitante/Visita -->
+    <!-- Modais -->
+    
+    <!-- Modal Portaria -->
     <div id="modal-visit" class="modal-overlay" style="display: none;">
         <div class="glass-container modal-content">
             <h2>Registrar Entrada</h2>
@@ -70,7 +133,6 @@
                 <div class="input-group">
                     <label for="dept_id">Setor de Destino</label>
                     <select id="dept_id" required>
-                        <!-- Populado via JS -->
                     </select>
                 </div>
                 <div class="input-group">
@@ -78,8 +140,65 @@
                     <input type="text" id="purpose">
                 </div>
                 <div class="modal-actions">
-                    <button type="button" id="close-modal-btn" class="btn-outline">Cancelar</button>
+                    <button type="button" id="close-modal-visit-btn" class="btn-outline">Cancelar</button>
                     <button type="submit" class="btn-primary" id="submit-visit-btn">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Novo Setor -->
+    <div id="modal-dept" class="modal-overlay" style="display: none;">
+        <div class="glass-container modal-content">
+            <h2>Cadastrar Novo Setor</h2>
+            <form id="new-dept-form">
+                <div class="input-group">
+                    <label for="dept_name">Nome do Setor</label>
+                    <input type="text" id="dept_name" required placeholder="Ex: RH, Financeiro">
+                </div>
+                <div class="input-group">
+                    <label for="dept_phone">Telefone / Ramal</label>
+                    <input type="text" id="dept_phone">
+                </div>
+                <div class="input-group">
+                    <label for="dept_location">Andar / Sala</label>
+                    <input type="text" id="dept_location">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="close-modal-dept-btn" class="btn-outline">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar Setor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Novo Usuário -->
+    <div id="modal-user" class="modal-overlay" style="display: none;">
+        <div class="glass-container modal-content">
+            <h2>Cadastrar Usuário (Porteiro/Admin)</h2>
+            <form id="new-user-form">
+                <div class="input-group">
+                    <label for="user_name">Login (Username)</label>
+                    <input type="text" id="user_name" required>
+                </div>
+                <div class="input-group">
+                    <label for="user_email">Email</label>
+                    <input type="email" id="user_email">
+                </div>
+                <div class="input-group">
+                    <label for="user_pwd">Senha</label>
+                    <input type="password" id="user_pwd" required minlength="6">
+                </div>
+                <div class="input-group">
+                    <label for="user_role">Perfil (Role)</label>
+                    <select id="user_role">
+                        <option value="OPERATOR">Operador (Apenas Portaria)</option>
+                        <option value="ADMIN">Administrador (Total)</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="close-modal-user-btn" class="btn-outline">Cancelar</button>
+                    <button type="submit" class="btn-primary">Criar Usuário</button>
                 </div>
             </form>
         </div>
