@@ -1,38 +1,39 @@
-# 🏢 Zelador - API de Controle de Portaria
+# 🏢 Zelador - Sistema de Controle de Portaria
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.111.0-009688.svg?logo=fastapi)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-316192.svg?logo=postgresql)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED.svg?logo=docker)
 
-**Zelador** é uma API RESTful robusta desenvolvida em **FastAPI** para o gerenciamento de portarias, recepções e controle de acesso a edifícios corporativos. O sistema permite o cadastro de visitantes, armazenamento de fotos (documentos ou rosto), controle de check-in/check-out e emissão de logs por setores.
+**Zelador** é um sistema completo 100% Python desenvolvido com **FastAPI** para o gerenciamento de portarias, recepções e controle de acesso a edifícios corporativos. O projeto oferece tanto uma **API RESTful robusta** quanto um **Painel de Interface Premium** (Frontend SPA) nativamente acoplado, trazendo uma estética *Glassmorphism* e *Dark Mode*.
 
 ---
 
 ## 🎯 Funcionalidades Principais
 
-- **Autenticação Segura (JWT)**: Login com OAuth2 Password Bearer e senhas criptografadas usando `bcrypt`.
-- **RBAC (Controle de Acesso Baseado em Roles)**:
-  - `ADMIN`: Gerenciamento completo de usuários (recepcionistas), setores e visão global.
-  - `OPERATOR`: Permissões para cadastro de visitantes e registros de check-in/check-out.
-- **Gestão de Departamentos**: Cadastro e controle de setores, andares e responsáveis.
-- **Gestão de Visitantes**: Registro de dados e documentos (CPF, RG, OAB) com validação contra duplicidade.
-- **Upload de Fotos**: Armazenamento local de fotos dos visitantes (suporte nativo via FastAPI).
-- **Controle de Fluxo (Check-in/Check-out)**:
-  - Registro de entrada vinculada ao visitante, ao recepcionista logado e ao setor destino.
-  - Marcação de saída e controle de "Visitantes no Local" em tempo real.
+- **Interface de Usuário Integrada (Frontend)**: Telas modernas para gerenciar visitantes e administração de setores sem depender do Swagger. 
+- **Autenticação Segura (JWT)**: Login com OAuth2 Password Bearer e senhas protegidas com `bcrypt`.
+- **RBAC (Controle de Acesso Baseado em Roles)**: Modos distintos na interface gráfica dependendo do acesso:
+  - `ADMIN`: Visualiza todos os menus, tem acesso total ao **Módulo de Cadastro de Setores** e ao **Módulo de Usuários**.
+  - `OPERATOR`: Visualiza apenas a tela da Portaria (Check-in/Check-out de visitantes), impedindo que modifique as configurações do prédio.
+- **Gestão de Departamentos**: Interface para cadastro e controle de setores, andares e ramais telefônicos.
+- **Gestão de Usuários**: Interface para criar contas de Operadores e Administradores.
+- **Controle de Portaria**:
+  - Formulário ágil para registro de visitantes (CPF, RG, Nome).
+  - Autopreenchimento para visitantes já cadastrados anteriormente.
+  - Tabela "Em Tempo Real" exibindo visitantes atualmente no prédio.
+  - Botões para registrar a Saída (Check-out) com 1 clique.
+- **Upload de Fotos**: Armazenamento local de fotos dos visitantes (suporte na API).
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Linguagem:** Python 3.11+
-- **Framework Web:** FastAPI
-- **Banco de Dados:** PostgreSQL
-- **ORM:** SQLAlchemy 2.0 (totalmente assíncrono)
-- **Migrações:** Alembic (preparado no ambiente)
-- **Validação:** Pydantic V2
-- **Segurança:** PyJWT, passlib[bcrypt]
+- **Backend & Servidor:** Python 3.11+ e FastAPI (Uvicorn)
+- **Frontend / Templates:** HTML5, Vanilla CSS3 (Glassmorphism), JavaScript (Fetch API) e Jinja2
+- **Banco de Dados:** PostgreSQL (imagem alpine)
+- **ORM:** SQLAlchemy 2.0 (assíncrono)
+- **Segurança:** PyJWT, bcrypt puro
 - **Infraestrutura:** Docker & Docker Compose
 
 ---
@@ -56,22 +57,22 @@
    ```
 
 3. **Pronto!**
-   - O Docker fará o download das imagens, instalará as dependências e o banco de dados.
-   - O script de seed (`init_db.py`) criará as tabelas e o usuário administrador padrão.
+   - O Docker fará o download das imagens, instalará as dependências e inicializará o banco.
+   - O sistema de seed criará o usuário administrador inicial e as estruturas base.
 
-### 🔑 Acesso de Administrador Padrão
-Após iniciar o contêiner, um usuário inicial será gerado para seu primeiro login:
+### 💻 Acessando o Sistema (Frontend)
+
+Com a aplicação rodando, acesse a Interface pelo navegador:
+- **Painel Zelador (Login):** [http://localhost:8051/login](http://localhost:8051/login)
+
+**Acesso de Administrador Padrão:**
 - **Username:** `admin`
 - **Password:** `admin123`
 
----
+### 📚 Documentação da API
 
-## 📚 Documentação da API (Swagger/ReDoc)
-
-Com a aplicação rodando, acesse a documentação interativa autogerada pelo FastAPI no seu navegador:
-
+Se você for realizar integrações sistêmicas, a documentação REST autogerada está disponível em:
 - **Swagger UI:** [http://localhost:8051/docs](http://localhost:8051/docs)
-- **ReDoc:** [http://localhost:8051/redoc](http://localhost:8051/redoc)
 
 ---
 
@@ -80,19 +81,19 @@ Com a aplicação rodando, acesse a documentação interativa autogerada pelo Fa
 ```text
 .
 ├── app/
-│   ├── api/
-│   │   ├── dependencies.py    # Injeção de dependências (banco, auth)
-│   │   └── v1/                # Endpoints (Auth, Users, Departments, Visitors, Visits)
-│   ├── core/                  # Configurações (Pydantic Settings), Segurança (JWT)
-│   ├── db/                    # Setup do Engine Assíncrono
-│   ├── models/                # Modelos SQLAlchemy (Tabelas do Banco)
-│   ├── schemas/               # Schemas Pydantic (Validação de Input/Output)
-│   └── services/              # Lógica de negócio e Upload de Arquivos
-├── media/
-│   └── fotos_visitantes/      # Armazenamento persistente de uploads (Docker Volume)
-├── Dockerfile                 # Construção da Imagem da API
-├── docker-compose.yml         # Orquestração (API + Postgres)
-├── init_db.py                 # Script de criação de tabelas e seed inicial
-├── requirements.txt           # Dependências Python
+│   ├── api/                   # Rotas da REST API (/v1)
+│   ├── core/                  # Segurança, Configurações e Hash
+│   ├── db/                    # Sessões do SQLAlchemy
+│   ├── models/                # Tabelas PostgreSQL
+│   ├── schemas/               # Validações e Serialização Pydantic
+│   ├── static/                # CSS e JS do Frontend da aplicação
+│   │   ├── css/style.css
+│   │   └── js/ui.js, api.js
+│   ├── templates/             # Arquivos HTML Jinja2 (Dashboard e Login)
+│   └── main.py                # Ponto de Entrada, injetor de rotas estáticas
+├── media/                     # Volumes persistentes Docker
+├── Dockerfile                 # Imagem de Construção
+├── docker-compose.yml         # Orquestração de Containers
+├── deploy.py                  # Script Python paramiko/ssh para Server Linux
 └── README.md
 ```
