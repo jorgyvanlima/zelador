@@ -3,7 +3,6 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from jose import jwt, JWTError # Oh wait, we installed PyJWT. I'll use pyjwt syntax.
 import jwt
 from app.db.session import AsyncSessionLocal
 from app.core.config import settings
