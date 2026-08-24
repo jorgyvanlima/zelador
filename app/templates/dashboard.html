@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zelador - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dashboard-body">
+    <nav class="glass-nav">
+        <div class="logo">
+            <span class="logo-icon">🏢</span> Zelador
+        </div>
+        <div class="user-menu">
+            <span id="current-user">Usuário Logado</span>
+            <button id="logout-btn" class="btn-outline">Sair</button>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <header class="page-header">
+            <h1>Painel da Portaria</h1>
+            <button id="new-visit-btn" class="btn-primary">+ Registrar Nova Entrada</button>
+        </header>
+
+        <section class="glass-container table-container">
+            <h2>Visitantes no Local (<span id="active-count">0</span>)</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Visitante ID</th>
+                        <th>Setor ID</th>
+                        <th>Entrada</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="active-visits-list">
+                    <!-- Registros populados via JS -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Modal Novo Visitante/Visita -->
+    <div id="modal-visit" class="modal-overlay" style="display: none;">
+        <div class="glass-container modal-content">
+            <h2>Registrar Entrada</h2>
+            <form id="new-visit-form">
+                <div class="input-group">
+                    <label for="doc_number">Número do Documento (CPF/RG)</label>
+                    <input type="text" id="doc_number" required placeholder="Apenas números">
+                </div>
+                <div id="new-visitor-fields" style="display: none;">
+                    <p class="alert-info">Visitante novo! Preencha os dados básicos.</p>
+                    <div class="input-group">
+                        <label for="full_name">Nome Completo</label>
+                        <input type="text" id="full_name">
+                    </div>
+                    <div class="input-group">
+                        <label for="doc_type">Tipo de Documento</label>
+                        <select id="doc_type">
+                            <option value="CPF">CPF</option>
+                            <option value="RG">RG</option>
+                            <option value="OAB">OAB</option>
+                            <option value="OUTRO">OUTRO</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="dept_id">Setor de Destino</label>
+                    <select id="dept_id" required>
+                        <!-- Populado via JS -->
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="purpose">Motivo (Opcional)</label>
+                    <input type="text" id="purpose">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="close-modal-btn" class="btn-outline">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="submit-visit-btn">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/ui.js"></script>
+</body>
+</html>

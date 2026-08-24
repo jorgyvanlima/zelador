@@ -1,4 +1,9 @@
-from fastapi import FastAPI
+import os
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 
@@ -28,6 +33,19 @@ app.include_router(departments_router, prefix=f"{settings.API_V1_STR}/department
 app.include_router(visitors_router, prefix=f"{settings.API_V1_STR}/visitors", tags=["Visitors"])
 app.include_router(visits_router, prefix=f"{settings.API_V1_STR}/visits", tags=["Visits"])
 
-@app.get("/")
-def root():
-    return {"message": "Bem-vindo à API do Zelador"}
+# Setup para Templates e Estáticos
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+@app.get("/", response_class=HTMLResponse, tags=["UI"])
+async def root(request: Request):
+    return RedirectResponse(url="/login")
+
+@app.get("/login", response_class=HTMLResponse, tags=["UI"])
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.get("/dashboard", response_class=HTMLResponse, tags=["UI"])
+async def dashboard_page(request: Request):
+    return templates.TemplateResponse("dashboard.html", {"request": request})
