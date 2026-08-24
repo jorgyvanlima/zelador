@@ -70,8 +70,8 @@ Após iniciar o contêiner, um usuário inicial será gerado para seu primeiro l
 
 Com a aplicação rodando, acesse a documentação interativa autogerada pelo FastAPI no seu navegador:
 
-- **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **Swagger UI:** [http://localhost:8051/docs](http://localhost:8051/docs)
+- **ReDoc:** [http://localhost:8051/redoc](http://localhost:8051/redoc)
 
 ---
 
