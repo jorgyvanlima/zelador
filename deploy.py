@@ -14,7 +14,7 @@ try:
     print("Conectado! Preparando o ambiente...")
     
     commands = [
-        "rm -rf zelador",
+        "echo 'Suporte@Gsi' | sudo -S rm -rf zelador",
         "git clone https://github.com/jorgyvanlima/zelador.git",
         "cd zelador && echo 'Suporte@Gsi' | sudo -S docker-compose up -d --build"
     ]
@@ -24,10 +24,10 @@ try:
         stdin, stdout, stderr = client.exec_command(cmd)
         exit_status = stdout.channel.recv_exit_status()
         
-        out = stdout.read().decode()
-        err = stderr.read().decode()
-        if out: print(out)
-        if err: print(err)
+        out = stdout.read()
+        err = stderr.read()
+        if out: print(out.decode('utf-8', 'replace'))
+        if err: print(err.decode('utf-8', 'replace'))
         
         if exit_status != 0:
             print(f"Aviso/Erro no comando: {cmd}")
