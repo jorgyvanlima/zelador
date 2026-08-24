@@ -70,6 +70,7 @@
                             <th>Nome</th>
                             <th>Ramal / Tel</th>
                             <th>Andar/Sala</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="departments-list">
@@ -94,6 +95,7 @@
                             <th>Email</th>
                             <th>Perfil</th>
                             <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="users-list">
@@ -147,11 +149,12 @@
         </div>
     </div>
 
-    <!-- Modal Novo Setor -->
+    <!-- Modal Setor -->
     <div id="modal-dept" class="modal-overlay" style="display: none;">
         <div class="glass-container modal-content">
-            <h2>Cadastrar Novo Setor</h2>
-            <form id="new-dept-form">
+            <h2 id="dept-modal-title">Cadastrar Novo Setor</h2>
+            <form id="dept-form">
+                <input type="hidden" id="dept_id_hidden">
                 <div class="input-group">
                     <label for="dept_name">Nome do Setor</label>
                     <input type="text" id="dept_name" required placeholder="Ex: RH, Financeiro">
@@ -166,17 +169,18 @@
                 </div>
                 <div class="modal-actions">
                     <button type="button" id="close-modal-dept-btn" class="btn-outline">Cancelar</button>
-                    <button type="submit" class="btn-primary">Salvar Setor</button>
+                    <button type="submit" class="btn-primary" id="dept-submit-btn">Salvar Setor</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal Novo Usuário -->
+    <!-- Modal Usuário -->
     <div id="modal-user" class="modal-overlay" style="display: none;">
         <div class="glass-container modal-content">
-            <h2>Cadastrar Usuário (Porteiro/Admin)</h2>
-            <form id="new-user-form">
+            <h2 id="user-modal-title">Cadastrar Usuário (Porteiro/Admin)</h2>
+            <form id="user-form">
+                <input type="hidden" id="user_id_hidden">
                 <div class="input-group">
                     <label for="user_name">Login (Username)</label>
                     <input type="text" id="user_name" required>
@@ -187,7 +191,7 @@
                 </div>
                 <div class="input-group">
                     <label for="user_pwd">Senha</label>
-                    <input type="password" id="user_pwd" required minlength="6">
+                    <input type="password" id="user_pwd" placeholder="Deixe em branco para manter a atual">
                 </div>
                 <div class="input-group">
                     <label for="user_role">Perfil (Role)</label>
@@ -196,9 +200,16 @@
                         <option value="ADMIN">Administrador (Total)</option>
                     </select>
                 </div>
+                <div class="input-group" id="user_active_group" style="display: none;">
+                    <label for="user_active">Status</label>
+                    <select id="user_active">
+                        <option value="true">Ativo</option>
+                        <option value="false">Inativo</option>
+                    </select>
+                </div>
                 <div class="modal-actions">
                     <button type="button" id="close-modal-user-btn" class="btn-outline">Cancelar</button>
-                    <button type="submit" class="btn-primary">Criar Usuário</button>
+                    <button type="submit" class="btn-primary" id="user-submit-btn">Criar Usuário</button>
                 </div>
             </form>
         </div>

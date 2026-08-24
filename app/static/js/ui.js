@@ -153,25 +153,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Fluxo: Gerenciar Setores (Admin)
         // ------------------------------------
         const modalDept = document.getElementById('modal-dept');
+        const deptForm = document.getElementById('dept-form');
+        
         if(document.getElementById('new-dept-btn')) {
-            document.getElementById('new-dept-btn').addEventListener('click', () => modalDept.style.display = 'flex');
+            document.getElementById('new-dept-btn').addEventListener('click', () => {
+                deptForm.reset();
+                document.getElementById('dept_id_hidden').value = '';
+                document.getElementById('dept-modal-title').textContent = 'Cadastrar Novo Setor';
+                document.getElementById('dept-submit-btn').textContent = 'Criar Setor';
+                modalDept.style.display = 'flex';
+            });
         }
         if(document.getElementById('close-modal-dept-btn')) {
             document.getElementById('close-modal-dept-btn').addEventListener('click', () => modalDept.style.display = 'none');
         }
 
-        const deptForm = document.getElementById('new-dept-form');
         if (deptForm) {
             deptForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const deptId = document.getElementById('dept_id_hidden').value;
+                const data = {
+                    name: document.getElementById('dept_name').value,
+                    phone_extension: document.getElementById('dept_phone').value || null,
+                    location: document.getElementById('dept_location').value || null,
+                    is_active: true
+                };
+
                 try {
-                    await api.createDepartment({
-                        name: document.getElementById('dept_name').value,
-                        phone_extension: document.getElementById('dept_phone').value || null,
-                        location: document.getElementById('dept_location').value || null,
-                        is_active: true
-                    });
-                    alert('Setor criado com sucesso!');
+                    if (deptId) {
+                        await api.updateDepartment(deptId, data);
+                        alert('Setor atualizado com sucesso!');
+                    } else {
+                        await api.createDepartment(data);
+                        alert('Setor criado com sucesso!');
+                    }
                     modalDept.style.display = 'none';
                     deptForm.reset();
                     await loadAdminDepartments();
@@ -186,26 +201,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Fluxo: Gerenciar Usuários (Admin)
         // ------------------------------------
         const modalUser = document.getElementById('modal-user');
+        const userForm = document.getElementById('user-form');
+        
         if(document.getElementById('new-user-btn')) {
-            document.getElementById('new-user-btn').addEventListener('click', () => modalUser.style.display = 'flex');
+            document.getElementById('new-user-btn').addEventListener('click', () => {
+                userForm.reset();
+                document.getElementById('user_id_hidden').value = '';
+                document.getElementById('user-modal-title').textContent = 'Cadastrar Usuário';
+                document.getElementById('user-submit-btn').textContent = 'Criar Usuário';
+                document.getElementById('user_pwd').setAttribute('required', 'true');
+                document.getElementById('user_active_group').style.display = 'none';
+                modalUser.style.display = 'flex';
+            });
         }
         if(document.getElementById('close-modal-user-btn')) {
             document.getElementById('close-modal-user-btn').addEventListener('click', () => modalUser.style.display = 'none');
         }
 
-        const userForm = document.getElementById('new-user-form');
         if (userForm) {
             userForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const userId = document.getElementById('user_id_hidden').value;
+                const pwd = document.getElementById('user_pwd').value;
+                const data = {
+                    username: document.getElementById('user_name').value,
+                    email: document.getElementById('user_email').value || null,
+                    role: document.getElementById('user_role').value
+                };
+                
+                if (pwd) data.password = pwd;
+
                 try {
-                    await api.createUser({
-                        username: document.getElementById('user_name').value,
-                        email: document.getElementById('user_email').value || null,
-                        password: document.getElementById('user_pwd').value,
-                        role: document.getElementById('user_role').value,
-                        is_active: true
-                    });
-                    alert('Usuário criado com sucesso!');
+                    if (userId) {
+                        data.is_active = document.getElementById('user_active').value === 'true';
+                        await api.updateUser(userId, data);
+                        alert('Usuário atualizado!');
+                    } else {
+                        data.is_active = true;
+                        await api.createUser(data);
+                        alert('Usuário criado com sucesso!');
+                    }
                     modalUser.style.display = 'none';
                     userForm.reset();
                     await loadUsers();
@@ -229,12 +264,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!tbody) return;
         try {
             const depts = await api.getDepartments();
+            window.currentDepartmentsData = depts; // Cache para edição
             tbody.innerHTML = depts.map(d => `
                 <tr>
                     <td>${d.id}</td>
                     <td>${d.name}</td>
                     <td>${d.phone_extension || '-'}</td>
                     <td>${d.location || '-'}</td>
+                    <td>
+                        <button class="btn-outline" style="padding:4px 8px; font-size:12px; margin-right:5px;" onclick="editDepartment(${d.id})">✏️</button>
+                        <button class="btn-outline" style="padding:4px 8px; font-size:12px; color:var(--error);" onclick="deleteDepartment(${d.id})">🗑️</button>
+                    </td>
                 </tr>
             `).join('');
         } catch(e) { console.error(e); }
@@ -245,12 +285,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!tbody) return;
         try {
             const users = await api.getUsers();
+            window.currentUsersData = users; // Cache para edição
             tbody.innerHTML = users.map(u => `
                 <tr>
                     <td>${u.username}</td>
                     <td>${u.email || '-'}</td>
                     <td><span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px;">${u.role}</span></td>
                     <td>${u.is_active ? 'Ativo' : 'Inativo'}</td>
+                    <td>
+                        <button class="btn-outline" style="padding:4px 8px; font-size:12px; margin-right:5px;" onclick="editUser('${u.id}')">✏️</button>
+                        <button class="btn-outline" style="padding:4px 8px; font-size:12px; color:var(--error);" onclick="deleteUser('${u.id}')">🗑️</button>
+                    </td>
                 </tr>
             `).join('');
         } catch(e) { console.error(e); }
@@ -298,6 +343,67 @@ window.doCheckout = async function(visitId) {
             window.location.reload(); 
         } catch (err) {
             alert(`Erro ao fazer check-out: ${err.message}`);
+        }
+    }
+}
+
+window.editDepartment = function(id) {
+    const dept = window.currentDepartmentsData.find(d => d.id === id);
+    if (!dept) return;
+    
+    document.getElementById('dept-form').reset();
+    document.getElementById('dept_id_hidden').value = dept.id;
+    document.getElementById('dept_name').value = dept.name;
+    document.getElementById('dept_phone').value = dept.phone_extension || '';
+    document.getElementById('dept_location').value = dept.location || '';
+    
+    document.getElementById('dept-modal-title').textContent = 'Editar Setor';
+    document.getElementById('dept-submit-btn').textContent = 'Salvar Alterações';
+    document.getElementById('modal-dept').style.display = 'flex';
+}
+
+window.deleteDepartment = async function(id) {
+    if (confirm('Tem certeza que deseja inativar este setor?')) {
+        try {
+            await api.deleteDepartment(id);
+            alert('Setor inativado com sucesso!');
+            window.location.reload();
+        } catch(e) {
+            alert('Erro: ' + e.message);
+        }
+    }
+}
+
+window.editUser = function(id) {
+    const user = window.currentUsersData.find(u => u.id === id);
+    if (!user) return;
+    
+    document.getElementById('user-form').reset();
+    document.getElementById('user_id_hidden').value = user.id;
+    document.getElementById('user_name').value = user.username;
+    document.getElementById('user_email').value = user.email || '';
+    document.getElementById('user_role').value = user.role;
+    
+    // Na edição, a senha não é obrigatória
+    document.getElementById('user_pwd').removeAttribute('required');
+    
+    // Status do user
+    document.getElementById('user_active_group').style.display = 'block';
+    document.getElementById('user_active').value = user.is_active ? 'true' : 'false';
+    
+    document.getElementById('user-modal-title').textContent = 'Editar Usuário';
+    document.getElementById('user-submit-btn').textContent = 'Salvar Alterações';
+    document.getElementById('modal-user').style.display = 'flex';
+}
+
+window.deleteUser = async function(id) {
+    if (confirm('Tem certeza que deseja inativar este usuário? Ele perderá acesso ao sistema.')) {
+        try {
+            await api.deleteUser(id);
+            alert('Usuário inativado com sucesso!');
+            window.location.reload();
+        } catch(e) {
+            alert('Erro: ' + e.message);
         }
     }
 }

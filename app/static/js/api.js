@@ -81,6 +81,19 @@ const api = {
         });
     },
 
+    async updateDepartment(id, data) {
+        return this.request(`/departments/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async deleteDepartment(id) {
+        return this.request(`/departments/${id}`, {
+            method: 'DELETE'
+        });
+    },
+
     async getUsers() {
         return this.request('/users/');
     },
@@ -89,6 +102,19 @@ const api = {
         return this.request('/users/', {
             method: 'POST',
             body: JSON.stringify(data)
+        });
+    },
+
+    async updateUser(id, data) {
+        return this.request(`/users/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async deleteUser(id) {
+        return this.request(`/users/${id}`, {
+            method: 'DELETE'
         });
     },
 

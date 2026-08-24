@@ -40,3 +40,33 @@ async def read_users(db: DbSession, admin: AdminUser):
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: CurrentUser):
     return current_user
+
+@router.put("/{user_id}", response_model=UserResponse)
+async def update_user(user_id: UUID, user_in: UserUpdate, db: DbSession, admin: AdminUser):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    update_data = user_in.model_dump(exclude_unset=True)
+    if "password" in update_data and update_data["password"]:
+        update_data["hashed_password"] = get_password_hash(update_data["password"])
+        del update_data["password"]
+        
+    for field, value in update_data.items():
+        setattr(user, field, value)
+        
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+@router.delete("/{user_id}")
+async def delete_user(user_id: UUID, db: DbSession, admin: AdminUser):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    user.is_active = False # Soft delete
+    await db.commit()
+    return {"message": "User deactivated"}
