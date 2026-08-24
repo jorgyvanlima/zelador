@@ -16,7 +16,7 @@ try:
     commands = [
         "echo 'Suporte@Gsi' | sudo -S rm -rf zelador",
         "git clone https://github.com/jorgyvanlima/zelador.git",
-        "cd zelador && echo 'Suporte@Gsi' | sudo -S docker-compose up -d --build"
+        "cd zelador && echo 'Suporte@Gsi' | sudo -S docker-compose down && echo 'Suporte@Gsi' | sudo -S docker-compose up -d --build"
     ]
     
     for cmd in commands:
